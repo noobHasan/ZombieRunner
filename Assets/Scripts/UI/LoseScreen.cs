@@ -13,7 +13,7 @@ namespace ZombiRunner
         public void ReatartGame()
         {
             _swipeControllerScr.ResetSwipe();
-            SceneManager.LoadScene(0);
+            SceneManager.LoadScene("gameplay");
         }
     }
 }

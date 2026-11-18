@@ -648,7 +648,7 @@ namespace CoverShooter
                         if (body == null)
                             continue;
 
-                        velocity = body.velocity;
+                        velocity = body.linearVelocity;
                         magnitude = velocity.magnitude;
 
                         if (magnitude < 0.1f)

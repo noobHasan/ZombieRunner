@@ -144,7 +144,7 @@ namespace ZombiRunner
                     yield return null;
                 }
 
-                bulletRB.velocity = Vector3.zero;
+                bulletRB.linearVelocity = Vector3.zero;
                 bulletRB.isKinematic = false;
 
                 MeshRenderer bulletMesh = bulletRB.GetComponent<MeshRenderer>();

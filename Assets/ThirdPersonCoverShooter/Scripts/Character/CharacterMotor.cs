@@ -3273,15 +3273,15 @@ namespace CoverShooter
                     var force = new Vector3(0, Gravity, 0) * Time.deltaTime;
 
                     if (!_isGrounded && _isRolling)
-                        _body.velocity -= force;
+                        _body.linearVelocity -= force;
                     else  if (_noMovementTimer < 0.2f || !_isGrounded || _isOnSlope || _groundTimer < 0.2f)
                     {
                         if (_isOnSlope && _noMovementTimer > float.Epsilon && !_isJumping)
-                            _body.velocity = Vector3.zero;
+                            _body.linearVelocity = Vector3.zero;
                         else if (_isGrounded && _jumpTimer < 0.1f && !_isOnSlope)
-                            _body.velocity -= force * 2;
+                            _body.linearVelocity -= force * 2;
                         else
-                            _body.velocity -= force;
+                            _body.linearVelocity -= force;
                     }
                 }
 
@@ -3410,7 +3410,7 @@ namespace CoverShooter
             {
                 _isCrouching = false;
                 _isWeaponBlocked = false;
-                _body.velocity = Vector3.zero;
+                _body.linearVelocity = Vector3.zero;
                 updateGround();
             }
 
@@ -4171,7 +4171,7 @@ namespace CoverShooter
                 body.isKinematic = false;
 
                 if (useRigidBody)
-                    body.velocity += (Util.HorizontalVector(_throwBodyAngle) + Vector3.up).normalized * Grenade.MaxVelocity;
+                    body.linearVelocity += (Util.HorizontalVector(_throwBodyAngle) + Vector3.up).normalized * Grenade.MaxVelocity;
             }
 
             var component = grenade.GetComponent<Grenade>();
@@ -4337,14 +4337,14 @@ namespace CoverShooter
                 if (_isClimbingAVault)
                 {
                     if (_normalizedClimbTime >= 0.5f && y < 0)
-                        animatorMovement.y = _body.velocity.y - Gravity * Time.deltaTime;
+                        animatorMovement.y = _body.linearVelocity.y - Gravity * Time.deltaTime;
                     else
                         animatorMovement.y = y * VaultSettings.VerticalScale;
                 }
                 else
                     animatorMovement.y = y * ClimbSettings.VerticalScale;
 
-                _body.velocity = animatorMovement;
+                _body.linearVelocity = animatorMovement;
 
                 const float turnStart = 0.3f;
                 const float turnEnd = 0.9f;
@@ -4363,7 +4363,7 @@ namespace CoverShooter
 
                 if (_isRolling && _isGrounded)
                 {
-                    animatorMovement.y = _body.velocity.y - Gravity * Time.deltaTime;
+                    animatorMovement.y = _body.linearVelocity.y - Gravity * Time.deltaTime;
 
                     if (_potentialCover == null)
                         animatorMovement -= transform.right * Vector3.Dot(transform.right, animatorMovement);
@@ -4374,11 +4374,11 @@ namespace CoverShooter
                 }
                 else if (_isRolling)
                 {
-                    var xz = _body.velocity;
+                    var xz = _body.linearVelocity;
                     xz.y = 0;
                     Util.Lerp(ref xz, Vector3.zero, 1);
 
-                    _body.velocity = new Vector3(xz.x, _body.velocity.y, xz.z);
+                    _body.linearVelocity = new Vector3(xz.x, _body.linearVelocity.y, xz.z);
                 }
             }
             else if (_isJumping || _isIntendingToJump)
@@ -4391,7 +4391,7 @@ namespace CoverShooter
             }
             else if (_isGettingHit)
             {
-                _body.velocity = _animator.deltaPosition / Time.deltaTime;
+                _body.linearVelocity = _animator.deltaPosition / Time.deltaTime;
                 transform.rotation = _animator.deltaRotation * transform.rotation;
             }
             else if (_isPerformingCustomAction || _useMeleeRootMotion)
@@ -4447,7 +4447,7 @@ namespace CoverShooter
                         applyVelocityToTheGround(MoveMultiplier * direction * Vector3.Dot(direction, animatorMovement) * Vector3.Dot(_currentMovement.Direction, animatorMovement / animatorSpeed));
                     }
                     else
-                        _body.velocity = new Vector3(0, _body.velocity.y, 0);
+                        _body.linearVelocity = new Vector3(0, _body.linearVelocity.y, 0);
                 }
                 else if (_movementInput > float.Epsilon)
                 {
@@ -4471,7 +4471,7 @@ namespace CoverShooter
                     }
                 }
                 else
-                    _body.velocity = Vector3.zero;
+                    _body.linearVelocity = Vector3.zero;
             }
 
             {
@@ -4547,13 +4547,13 @@ namespace CoverShooter
                         result *= 1.0f - Mathf.Clamp01((angle - MinSlope) / (MaxSlope - MinSlope));
                     }
 
-                    _body.velocity = result;
+                    _body.linearVelocity = result;
                 }
                 else
-                    _body.velocity = Vector3.zero;
+                    _body.linearVelocity = Vector3.zero;
             }
             else
-                _body.velocity = velocity;
+                _body.linearVelocity = velocity;
         }
 
         private void turn(float speed)
@@ -4607,7 +4607,7 @@ namespace CoverShooter
                 _isJumping = false;
                 _nextJumpTimer = 0;
 
-                if (_normalizedClimbTime > 0.5f && _isClimbingAVault && _body.velocity.y < 0)
+                if (_normalizedClimbTime > 0.5f && _isClimbingAVault && _body.linearVelocity.y < 0)
                 {
                     if (!findGround(FallThreshold) && !_isFalling)
                     {
@@ -4615,9 +4615,9 @@ namespace CoverShooter
                         _isFalling = true;
                         _isGrounded = false;
 
-                        var velocity = _body.velocity;
+                        var velocity = _body.linearVelocity;
                         var vector = transform.forward * Vector3.Dot(transform.forward, velocity);
-                        _body.velocity = new Vector3(vector.x, velocity.y, vector.z);
+                        _body.linearVelocity = new Vector3(vector.x, velocity.y, vector.z);
                     }
                 }
             }
@@ -5748,7 +5748,7 @@ namespace CoverShooter
                 if (!_cover.In && !_isClimbing && !_isJumping && _nextJumpTimer < float.Epsilon && _wantsToJump)
                     _isIntendingToJump = true;
             }
-            else if (_body.velocity.y < -5)
+            else if (_body.linearVelocity.y < -5)
                 _isJumping = false;
 
             if (_isGrounded && _ignoreJumpTimer <= float.Epsilon)
@@ -5772,7 +5772,7 @@ namespace CoverShooter
 
                     var v = _jumpForwardMultiplier * Util.HorizontalVector(_jumpAngle) * JumpSettings.Speed;
                     v.y = JumpSettings.Strength;
-                    _body.velocity = v;
+                    _body.linearVelocity = v;
                 }
                 else if (_isJumping)
                     _isJumping = false;
@@ -5784,7 +5784,7 @@ namespace CoverShooter
             {
                 if (!_isFalling)
                 {
-                    if (((!_isJumping && _body.velocity.y < -1) || (_isJumping && _body.velocity.y < -4)) &&
+                    if (((!_isJumping && _body.linearVelocity.y < -1) || (_isJumping && _body.linearVelocity.y < -4)) &&
                         !findGround(FallThreshold))
                     {
                         _animator.SetTrigger("Fall");
